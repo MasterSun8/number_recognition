@@ -6,19 +6,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-        /* just to be sure these are full screen*/
-
-        canvas {
-            height: 97vh;
-            width: 99vw;
+        body {
+            display: flex;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
         }
 
-        /* To remove the scrollbars */
+        button,
+        div {
+            z-index: 0;
+            color: white;
+            background-color: black;
+            height: fit-content;
+        }
+
+        a {
+            all: unset;
+            z-index: 0;
+            color: black;
+            background-color: white;
+            height: fit-content;
+        }
+
+        canvas {
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+        }
     </style>
 </head>
 
 <body>
-    <canvas id="myCanvas" style="border:1px solid #000000;"></canvas>
+    <canvas id="myCanvas"></canvas>
+    <a href="paint.html">Test the AI</a>
     <script>
         const activation = (x) => x > 0 ? x : 0
         let arr
@@ -44,7 +66,7 @@
         canvas.width = document.body.scrollWidth
         canvas.height = document.body.scrollHeight
         console.log(canvas.width)
-        console.log(canvas.height)/**/
+        console.log(canvas.height)
 
         function drawLine(begin, end) {
             ctx.beginPath()
@@ -60,53 +82,77 @@
             ctx.stroke()
         }
 
-
-
-        getData().then(() => {
-            console.log(arr)
-            console.log(biases)
-            let c = Math.floor(255 / arr.length)
-            let temp = canvas.height / arr.length
+        function drawNetwork(arr, biases) {
+            let c = Math.floor(255 / (arr.length + 1))
+            let temp = canvas.height / (arr.length + 1)
             let pos = temp / 2
             let col = 0
 
+            let input = arr[0][0].length
+
+            let t = canvas.width / input
+            let co = rgbToHex(col, 0, (255 - col))
+            let p = t / 2
+
+            for (let ind = 0; ind < input; ind++) {
+                drawDot(pos, p, 0.25 * t)
+                p += t
+            }
+            pos += temp
+
+
+            col += c
             arr.forEach((x, i) => {
+                console.log(pos)
                 console.log(x)
-                let t = canvas.width / x.length
+                t = canvas.width / x.length
                 col += c
-                let co = rgbToHex(col, 0, (255 - col))
-                let p = t / 2
+                co = rgbToHex(col, 0, (255 - col))
+                p = t / 2
                 x.forEach((y, ind) => {
                     ctx.strokeStyle = co
                     ctx.lineWidth = 0.125 * t
-                    if (i > 0) {
-                        try {
-                            ctx.lineWidth = 0.125 * t / (3 / biases[i - 1][ind])
-                        } catch { }
-                    }
+                    try {
+                        if (biases[i][ind] > 0) {
+                            ctx.lineWidth = 0.125 * t / (3 / biases[i][ind])
+                        }else{
+                            ctx.lineWidth = activation(0.125 * t + biases[i][ind])
+                        }
+                    } catch { }
                     drawDot(pos, p, 0.25 * t)
-                    if (i > 0) {
-                        let te = canvas.width / arr[i - 1].length
-                        let po = te / 2
-                        arr[i - 1].forEach((l, index) => {
-                            let n = y[index]
-                            if (i != arr.length - 1) {
+                    console.log(0.25 * t)
 
-                            }
-                            n = activation(n)
-                            ctx.lineWidth = 0.05 * te * n
-                            if (n != 0) {
-                                drawLine([po, pos - temp], [p, pos])
-                            }
-                            po += te
-                        })
-                    }/**/
+                    if (i > 0) {
+                        input = arr[i - 1].length
+                    }
+
+                    let te = canvas.width / input
+
+                    let po = te / 2
+                    if (i == 0) {
+
+                    }
+
+                    for (let index = 0; index < input; index++) {
+                        let n = y[index]
+                        n = activation(n)
+                        ctx.lineWidth = 0.05 * te * n
+                        if (n != 0) {
+                            drawLine([po, pos - temp], [p, pos])
+                        }
+                        po += te
+                    }
+
                     p += t
                 })
                 pos += temp
             })
-            /**/
+        }
+
+        getData().then(() => {
+            drawNetwork(arr, biases)
         })
+
 
     </script>
 </body>

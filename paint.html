@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            display: flex;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        button,
+        div>div {
+            z-index: 0;
+            color: white;
+            background-color: black;
+            height: fit-content;
+        }
+
+        a {
+            all: unset;
+            z-index: 0;
+            color: white;
+            background-color: black;
+            height: fit-content;
+        }
+
+        canvas {
+            background-color: black;
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="myCanvas"></canvas>
+    <div style="display: flex; width: 50vw; justify-content: space-between;">
+        <a href="./..">Network Visualization</a>
+        <div id="">Number: </div>
+        <button onclick="clearCanvas()">Clear</button>
+    </div>
+    <script>
+        var canvas = document.getElementById("myCanvas")
+        var ctx = canvas.getContext("2d", {
+            'willReadFrequently': true
+        })
+        canvas.width = 28
+        canvas.height = 28
+        let coord = {
+            'x': 0,
+            'y': 0
+        }
+
+
+        async function getData() {
+            let n = await fetch('nodes.txt')
+            let b = await fetch('biases.txt')
+            arr = await n.json()
+            biases = await b.json()
+        }
+
+        const activation = (x) => x > 0 ? x : 0
+        let arr
+        let biases
+
+        getData().then(() => {
+            document.addEventListener('mousedown', start)
+            document.addEventListener('mouseup', stop)
+            window.addEventListener('resize', resize)
+        })
+
+        function resize() {
+            canvas.style.width = window.innerWidth
+            canvas.style.height = window.innerHeight
+        }
+
+        resize()
+
+        function start(event) {
+            document.addEventListener('mousemove', draw)
+            reposition(event)
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+        }
+
+        function reposition(event) {
+            coord.x = (event.clientX - canvas.offsetLeft) / window.innerWidth * 28
+            coord.y = (event.clientY - canvas.offsetTop) / innerHeight * 28
+        }
+
+        function stop() {
+            document.removeEventListener('mousemove', draw);
+        }
+
+        async function getPixelArray() {
+            let data = ctx.getImageData(0, 0, canvas.width, canvas.height).data
+            let x = new Array()
+            for (let i = 0; i < data.length; i += 4) {
+                let avg = (data[i] + data[i + 1] + data[i + 2]) / 3;
+                x.push(avg)
+            }
+            return x
+        }
+
+        function draw(event) {
+            ctx.beginPath()
+            ctx.lineWidth = 3
+            ctx.lineCap = 'round'
+            ctx.strokeStyle = '#FFFFFF'
+            ctx.moveTo(coord.x, coord.y)
+            reposition(event)
+            ctx.lineTo(coord.x, coord.y)
+            ctx.stroke()
+            getPixelArray().then(x => {
+                console.log(x)
+            })
+        }
+
+
+    </script>
+</body>
+
+</html>

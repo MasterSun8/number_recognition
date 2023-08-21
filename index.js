@@ -2,6 +2,20 @@ const fs = require("fs/promises")
 
 const activation = (x) => x > 0 ? x : 0
 
+async function csvObject(name) {
+    let arr = new Array()
+    let val = new Array()
+    let file = await fs.readFile('mnist_' + name + '.csv', 'utf8')
+    let temp = file.split("\r\n")
+    temp.forEach(row => {
+        let t = row.split(",")
+        val.push(t.shift())
+        t = t.map(x => parseInt(x, 10) / 255)
+        arr.push(t)
+    })
+    return [val, arr]
+}
+
 function randomArray(size) {
     let arr = new Array()
     for (let i = 0; i < size; i++) {
@@ -10,21 +24,10 @@ function randomArray(size) {
     return arr
 }
 
-function dotProd(arr1, arr2) {
-    if (!x?.length || x.length != y.length) {
-        throw new Error("Arrays are of different length")
-    }
-    let prod = 0
-    arr1.forEach((x, i) => {
-        prod += x * arr2[i]
-    })
-    return prod
-}
-
 function createBiases(count) {
     let biases = new Array()
     for (let c = 0; c < count; c++) {
-        biases.push(Math.random() * 2)
+        biases.push(Math.random() - 0.2)
     }
     return biases
 }
@@ -38,13 +41,12 @@ function createLayer(conns, nodes) {
 }
 
 function makeLayers(...args) {
-    let before = 1
+    let before = args.shift()
     let layers = new Array()
     args.forEach(count => {
         layers.push(createLayer(before, count))
         before = count
     })
-    args.shift()
     let biases = new Array()
     args.forEach(x => {
         biases.push(createBiases(x))
@@ -53,35 +55,40 @@ function makeLayers(...args) {
 }
 
 function calculateLayer(input, output, biases) {
-    /*
+    let inputSize = input.length
+    if (input.length != output[0].length) {
+        throw new Error(`The layer size is not equal: expected ${output[0].length} in the first layer but it's ${inputSize}`)
+    }
 
-    input = 784x1
-    output = 15x784
-    biases = 15x1
+    let finalOutput = new Array()
+    let sum = 0
 
-    /**/
+    for (let i = 0; i < output.length; i++) {
+        let result = 0
+        for (let index = 0; index < inputSize; index++) {
+            result += output[i][index] * input[index]
+        }
+        result = activation(result + biases[i])
+        sum += result
+        finalOutput.push(result)
+    }
 
-    // for(let i = 0; i<output.length)
+    finalOutput = finalOutput.map((x) => {
+        return x / sum
+    })
+    return finalOutput
 }
 
-async function csvObject(name) {
-    let arr = new Array()
-    let val = new Array()
-    let file = await fs.readFile('mnist_' + name + '.csv', 'utf8')
-    let temp = file.split("\r\n")
-    temp.forEach(row => {
-        let t = row.split(",")
-        val.push(t.shift())
-        t = t.map(x => parseInt(x, 10))
-        /*Math.round(parseInt(x, 10) / 255 * 1) / 1)
-        let tem = new Array()
-        for(let i = 0; i<t.length; i+=28){
-            tem.push(t.slice(i, i+28))
-        }
-        /**/
-        arr.push(t)
-    })
-    return [val, arr]
+function recognizeNumber(input, layers, biases, trueValue) {
+    let lay = calculateLayer(input, layers[0], biases[0])
+    let layer = 1
+    for (; layer < layers.length; layer++) {
+        lay = calculateLayer(lay, layers[layer], biases[layer])
+    }
+    let result = lay.indexOf(Math.max(...lay))
+    console.table(lay)
+    console.log(`The result is: ${result} expected ${trueValue}`)
+    return lay
 }
 
 async function main() {
@@ -89,81 +96,19 @@ async function main() {
     //let [trainVal, trainArray] = csvObject('train')
     let [testVal, testArray] = await csvObject('test')
     const size = testArray[0].length
-    let val
-
-    let num = process.argv[2]
-    val = num = num ? num : 0
     console.timeEnd("LoadCSV")
 
-    /*
-    console.log(val ? testVal[num] : '')
-    console.log(testArray[num])
-    /**/
-
     console.time("Layer creation")
-    let [biases, layers] = makeLayers(size, 15, 10)
+    let [biases, layers] = makeLayers(size, 20, 10)
     console.timeEnd("Layer creation")
-    //console.log(biases)
     fs.writeFile('nodes.txt', JSON.stringify(layers))
     fs.writeFile('biases.txt', JSON.stringify(biases))
 
+    console.time('Single network calculation')
+    let output = recognizeNumber(testArray[0], layers, biases, testVal[0])
 
-    let tee = 0
-    let layer = 1
-
-    calculateLayer(layers[layer-1], layers[layer], biases[layer-1])
-/*
-    let res = new Array()
-    let biggest = 0
-    for (let ind = 0; ind < layers[layer].length; ind++) {
-        tee = 0
-        node = layers[layer][ind]
-        for (let index = 0; index < node.length; index++) {
-            tee += (node[index] * layers[layer - 1][index])
-        }
-        let r = activation(tee + biases[layer - 1][ind])
-        biggest = r > biggest ? r : biggest
-        res.push(r)
-    }
-    console.table(res)
-
-    console.log(biggest)
-
-    /*
-        console.log('')
-        res = new Array()
-    
-        layers[layer].forEach((node, ind) => {
-            tee = 0
-            node.forEach((prod, index) => {
-                tee += (prod * layers[layer - 1][index])
-            })
-            let r = activation(tee + biases[layer - 1][ind])
-            biggest = r>biggest ? r : biggest
-            res.push(r)
-        })
-        console.table(res)
-    /**/
+    console.timeEnd('Single network calculation')
 }
-
-/*    
-    let string = ''
-    let temp = '|'
-    testArray[num].forEach(e => {
-        temp = '|'
-        e.forEach((el, i) => {
-            spaces = el.length
-            spaces = 2-spaces
-            let val = '\u001b[38;5;' + el*255 + 'm'
-            temp += val
-            temp += ' '.repeat(spaces)
-            temp += el
-        })
-        temp += ' |'
-        string += temp + '\n'
-    })
-    console.log(string)
-/**/
 
 console.time("Program")
 main().then(() => {
