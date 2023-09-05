@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script defer src="neural-network.js"></script>
     <style>
         body {
             display: flex;
@@ -43,12 +44,13 @@
     <canvas id="myCanvas"></canvas>
     <div style="display: flex; width: 50vw; justify-content: space-between;">
         <a href="./..">Network Visualization</a>
-        <div id="">Number: </div>
+        <div id="number">Number: </div>
         <button onclick="clearCanvas()">Clear</button>
     </div>
     <script>
-        var canvas = document.getElementById("myCanvas")
-        var ctx = canvas.getContext("2d", {
+        const number = document.getElementById("number")
+        const canvas = document.getElementById("myCanvas")
+        const ctx = canvas.getContext("2d", {
             'willReadFrequently': true
         })
         canvas.width = 28
@@ -58,17 +60,16 @@
             'y': 0
         }
 
-
+        let arr
+        let biases
+        let nn
         async function getData() {
             let n = await fetch('nodes.txt')
             let b = await fetch('biases.txt')
             arr = await n.json()
             biases = await b.json()
+            nn = new NeuralNetwork(true, arr, biases)
         }
-
-        const activation = (x) => x > 0 ? x : 0
-        let arr
-        let biases
 
         getData().then(() => {
             document.addEventListener('mousedown', start)
@@ -121,11 +122,9 @@
             ctx.lineTo(coord.x, coord.y)
             ctx.stroke()
             getPixelArray().then(x => {
-                console.log(x)
+                number.innerHTML = `Number: ${nn.recognizeNumber(x)}`
             })
         }
-
-
     </script>
 </body>
 
