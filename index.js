@@ -25,7 +25,7 @@ async function main() {
 
 
     console.time("Layer creation")
-    let network = new NeuralNetwork(size, 20, 10)
+    let network = new NeuralNetwork(size, 20, 5, 10)
     console.timeEnd("Layer creation")
     fs.writeFile('nodes.txt', JSON.stringify(network.layers))
     fs.writeFile('biases.txt', JSON.stringify(network.biases))
@@ -33,6 +33,8 @@ async function main() {
     console.time('Single network calculation')
     let output = network.recognizeNumber(testArray[0], testVal[0])
     console.timeEnd('Single network calculation')
+
+    console.log(network.layers)
 }
 
 console.time("Program")

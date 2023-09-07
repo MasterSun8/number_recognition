@@ -92,8 +92,8 @@ class NeuralNetwork {
         return result
     }
 
-    backProp() {
-
+    backProp(output) {
+        
     }
 
 }
