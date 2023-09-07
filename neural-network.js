@@ -76,9 +76,8 @@ class NeuralNetwork {
     }
 
     forwardProp(input) {
-        let lay = this.calculateLayer(input, this.layers[0], this.biases[0])
-        for (let layer = 1; layer < this.layers.length; layer++) {
-            lay = this.calculateLayer(lay, this.layers[layer], this.biases[layer])
+        for (let layer = 0; layer < this.layers.length; layer++) {
+            input = this.calculateLayer(input, this.layers[layer], this.biases[layer])
         }
         return lay
     }
