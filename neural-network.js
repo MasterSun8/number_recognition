@@ -69,9 +69,9 @@ class NeuralNetwork {
             finalOutput.push(result)
         }
 
-        finalOutput = finalOutput.map((x) => {
-            return x / sum
-        })
+        // finalOutput = finalOutput.map((x) => {
+            // return x / sum
+        // })
         return finalOutput
     }
 
@@ -83,9 +83,18 @@ class NeuralNetwork {
         return lay
     }
 
+    getNumber(input){
+        let result = input.indexOf(Math.max(...input))
+        return result
+    }
+
+    test(input, trueValue){
+        let res = this.getNumber(input)
+        return res==trueValue
+    }
+
     recognizeNumber(input, trueValue = false) {
-        let lay = this.forwardProp(input, this.layers, this.biases)
-        let result = lay.indexOf(Math.max(...lay))
+        let result = this.getNumber(input)
         if (trueValue) {
             console.log(`The result is: ${result} expected ${trueValue}`)
         }
@@ -96,6 +105,22 @@ class NeuralNetwork {
         
     }
 
+    iterate(inputs, values){
+        let success = 0
+        console.time("Full iteration")
+        for(let i = 0; i<inputs.length; i++){
+            let result = this.forwardProp(inputs[i])
+            let suc = this.test(result, values[i])
+            success = suc ? ++success : success
+            this.backProp(result)
+        }
+        console.timeEnd("Full iteration")
+        return success
+    }
+
+    train(inputs, values){
+        console.log(this.iterate(inputs, values)/inputs.length)
+    }
 }
 
 module.exports = NeuralNetwork

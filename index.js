@@ -30,11 +30,15 @@ async function main() {
     fs.writeFile('nodes.txt', JSON.stringify(network.layers))
     fs.writeFile('biases.txt', JSON.stringify(network.biases))
 
+/*
     console.time('Single network calculation')
     let output = network.recognizeNumber(testArray[0], testVal[0])
     console.timeEnd('Single network calculation')
+*/
 
-    console.log(network.layers)
+    console.time("Train")
+    network.train(testArray, testVal)
+    console.timeEnd("Train")
 }
 
 console.time("Program")
