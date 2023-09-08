@@ -79,7 +79,16 @@ class NeuralNetwork {
         for (let layer = 0; layer < this.layers.length; layer++) {
             input = this.calculateLayer(input, this.layers[layer], this.biases[layer])
         }
-        return lay
+        return input
+    }
+
+    calculateNetwork(input){
+        let table = [input]
+        for (let layer = 0; layer < this.layers.length; layer++) {
+            input = this.calculateLayer(input, this.layers[layer], this.biases[layer])
+            table.push(input)
+        }
+        return table
     }
 
     getNumber(input){
@@ -93,7 +102,8 @@ class NeuralNetwork {
     }
 
     recognizeNumber(input, trueValue = false) {
-        let result = this.getNumber(input)
+        let result = this.getNumber(this.forwardProp(input))
+        console.log(result)
         if (trueValue) {
             console.log(`The result is: ${result} expected ${trueValue}`)
         }
@@ -101,16 +111,17 @@ class NeuralNetwork {
     }
 
     backProp(output) {
-        
+        output.forEach(x => {
+            console.log(x.length)
+        })
     }
 
     iterate(inputs, values){
         let success = 0
         console.time("Full iteration")
-        for(let i = 0; i<inputs.length; i++){
-            let result = this.forwardProp(inputs[i])
-            let suc = this.test(result, values[i])
-            success = suc ? ++success : success
+        for(let i = 0; i<15; i++){
+            let result = this.calculateNetwork(inputs[i])
+            success = this.test(result[result.length-1], values[i]) ? ++success : success
             this.backProp(result)
         }
         console.timeEnd("Full iteration")
