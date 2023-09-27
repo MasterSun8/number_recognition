@@ -114,9 +114,9 @@
                     ctx.lineWidth = 0.125 * t
                     try {
                         if (biases[i][ind] > 0) {
-                            ctx.lineWidth = 0.125 * t / (3 / biases[i][ind])
+                            ctx.lineWidth = 0.125 * t / (3 / biases[i][ind]) + 0.2
                         } else {
-                            ctx.lineWidth = NeuralNetwork.activation(0.125 * t + biases[i][ind])
+                            ctx.lineWidth = NeuralNetwork.activation(0.125 * t + biases[i][ind]) + 0.2
                         }
                     } catch { }
                     drawDot(pos, p, 0.25 * t)
