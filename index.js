@@ -18,17 +18,17 @@ async function csvObject(name) {
 async function main() {
     console.time("LoadCSV")
     //let [trainVal, trainArray] = csvObject('train')
-    let [testVal, testArray] = await csvObject('test')
-    const size = testArray[0].length
+    // let [testVal, testArray] = await csvObject('test')
+    // const size = testArray[0].length
     console.timeEnd("LoadCSV")
 
-
+    const size = 784
 
     console.time("Layer creation")
     let network = new NeuralNetwork(size, 16, 16, 10)
     console.timeEnd("Layer creation")
-    fs.writeFile('nodes.txt', JSON.stringify(network.layers))
-    fs.writeFile('biases.txt', JSON.stringify(network.biases))
+    // fs.writeFile('nodes.txt', JSON.stringify(network.layers))
+    // fs.writeFile('biases.txt', JSON.stringify(network.biases))
 
 /*
     console.time('Single network calculation')
@@ -37,7 +37,8 @@ async function main() {
 */
 
     console.time("Train")
-    network.train(testArray, testVal)
+    network.backProp(network.calculateNetwork(network.randomArray(784)))
+    // network.train(testArray, testVal)
     console.timeEnd("Train")
 }
 

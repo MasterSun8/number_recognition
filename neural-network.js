@@ -52,7 +52,7 @@ class NeuralNetwork {
 
     calculateLayer(input, output, biases) {
         let inputSize = input.length
-        if (input.length != output[0].length) {
+        if (inputSize != output[0].length) {
             throw new Error(`The layer size is not equal: expected ${output[0].length} in the first layer but it's ${inputSize}`)
         }
 
@@ -110,10 +110,22 @@ class NeuralNetwork {
         return result
     }
 
+    reshapeLayer(){
+        
+    }
+
     backProp(output) {
-        output.forEach(x => {
-            console.log(x.length)
-        })
+        console.log(output.length)
+        for(let i=0; i<output[output.length-1].length; i++){
+            
+        }
+        
+        /*
+            [784, 16, 16, 10]
+              X   X   X   X
+            [ 1, 784, 16, 16]
+            [784, 16, 16, 10]
+        */
     }
 
     iterate(inputs, values){
