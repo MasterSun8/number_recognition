@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script defer src="neural-network.js"></script>
+    <style>
+        body {
+            display: flex;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        button,
+        div {
+            z-index: 0;
+            color: white;
+            background-color: black;
+            height: fit-content;
+        }
+
+        a {
+            all: unset;
+            z-index: 0;
+            color: black;
+            background-color: white;
+            height: fit-content;
+        }
+
+        canvas {
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="myCanvas"></canvas>
+    <a href="paint.html">Test the AI</a>
+    <script>
+        let arr
+        let biases
+        async function getData() {
+            let n = await fetch('nodes.txt')
+            let b = await fetch('biases.txt')
+            arr = await n.json()
+            biases = await b.json()
+        }
+
+        function componentToHex(c) {
+            var hex = c.toString(16);
+            return hex.length == 1 ? "0" + hex : hex;
+        }
+
+        function rgbToHex(r, g, b) {
+            return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+        }
+
+        function drawNetwork(arr, biases) {
+            let el = document.createElement("div");
+            
+        }
+
+        getData().then(() => {
+            drawNetwork(arr, biases)
+        })
+
+
+    </script>
+</body>
+
+</html>

@@ -61,6 +61,8 @@
             return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
         }
 
+        const sel = rgbToHex(0, 255, 0)
+
         var canvas = document.getElementById("myCanvas");
         var ctx = canvas.getContext("2d");
         canvas.width = document.body.scrollWidth
@@ -82,15 +84,38 @@
             ctx.stroke()
         }
 
-        function drawNetwork(arr, biases) {
+        canvas.addEventListener("mousemove", (e) => {
+            let temp = Math.round(canvas.height / (arr.length + 1))
+            let a = e.clientY%temp
+            let o = (e.clientY - a) / temp
+
+            console.log(arr.length)
+            let t = 0
+
+            if(o>0){
+                let t = arr[o-1].length+1
+            }else{
+                let t = arr[o-1].length+1
+            }
+            Math.round(canvas.width / t)
+            
+            console.log(o)
+
+            if(false){
+            console.log(e.clientY)
+            }
+        })
+
+        function drawNetwork(ar, bi) {
+            arr = ar
+            biases = bi
             let c = Math.floor(255 / (arr.length + 1))
             let temp = canvas.height / (arr.length + 1)
+            let input = arr[0][0].length
+            let t = canvas.width / input
             let pos = temp / 2
             let col = 0
 
-            let input = arr[0][0].length
-
-            let t = canvas.width / input
             let co = rgbToHex(col, 0, (255 - col))
             let p = t / 2
 

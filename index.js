@@ -22,13 +22,13 @@ async function main() {
     // const size = testArray[0].length
     console.timeEnd("LoadCSV")
 
-    const size = 784
+    const size = 6
 
     console.time("Layer creation")
-    let network = new NeuralNetwork(size, 16, 16, 10)
+    let network = new NeuralNetwork(size, 6, 8)
     console.timeEnd("Layer creation")
-    // fs.writeFile('nodes.txt', JSON.stringify(network.layers))
-    // fs.writeFile('biases.txt', JSON.stringify(network.biases))
+    fs.writeFile('nodes.txt', JSON.stringify(network.layers))
+    fs.writeFile('biases.txt', JSON.stringify(network.biases))
 
 /*
     console.time('Single network calculation')
@@ -37,7 +37,7 @@ async function main() {
 */
 
     console.time("Train")
-    network.backProp(network.calculateNetwork(network.randomArray(784)))
+    // network.backProp(network.calculateNetwork(network.randomArray(size)))
     // network.train(testArray, testVal)
     console.timeEnd("Train")
 }
