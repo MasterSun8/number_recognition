@@ -89,21 +89,20 @@
             let a = e.clientY%temp
             let o = (e.clientY - a) / temp
 
-            console.log(arr.length)
             let t = 0
 
             if(o>0){
-                let t = arr[o-1].length+1
+                t = arr[o-1].length
             }else{
-                let t = arr[o-1].length+1
+                t = arr[0][0].length
             }
-            Math.round(canvas.width / t)
             
-            console.log(o)
+            let tt = Math.round(canvas.width / t)
+            let aa = e.clientX%tt
+            let oo = (e.clientX - aa) / tt
 
-            if(false){
-            console.log(e.clientY)
-            }
+            console.log([o, oo])
+            
         })
 
         function drawNetwork(ar, bi) {
