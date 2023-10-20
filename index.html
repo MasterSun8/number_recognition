@@ -26,12 +26,13 @@
         a {
             all: unset;
             z-index: 0;
-            color: black;
-            background-color: white;
+            color: white;
+            background-color: black;
             height: fit-content;
         }
 
         canvas {
+            background-color: black;
             position: absolute;
             width: 100vw;
             height: 100vh;
@@ -61,14 +62,10 @@
             return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
         }
 
-        const sel = rgbToHex(0, 255, 0)
-
         var canvas = document.getElementById("myCanvas");
         var ctx = canvas.getContext("2d");
         canvas.width = document.body.scrollWidth
         canvas.height = document.body.scrollHeight
-        console.log(canvas.width)
-        console.log(canvas.height)
 
         function drawLine(begin, end) {
             ctx.beginPath()
@@ -76,7 +73,6 @@
             ctx.lineTo(...end)
             ctx.stroke()
         }
-
 
         function drawDot(y, x, size) {
             ctx.beginPath()
@@ -108,7 +104,8 @@
         function drawNetwork(ar, bi) {
             arr = ar
             biases = bi
-            let c = Math.floor(255 / (arr.length + 1))
+            console.time("draw")
+            let c = Math.floor(255 / (arr.length))
             let temp = canvas.height / (arr.length + 1)
             let input = arr[0][0].length
             let t = canvas.width / input
@@ -116,6 +113,7 @@
             let col = 0
 
             let co = rgbToHex(col, 0, (255 - col))
+            ctx.strokeStyle = co
             let p = t / 2
 
             for (let ind = 0; ind < input; ind++) {
@@ -124,11 +122,7 @@
             }
             pos += temp
 
-
-            col += c
             arr.forEach((x, i) => {
-                console.log(pos)
-                console.log(x)
                 t = canvas.width / x.length
                 col += c
                 co = rgbToHex(col, 0, (255 - col))
@@ -144,7 +138,6 @@
                         }
                     } catch { }
                     drawDot(pos, p, 0.25 * t)
-                    console.log(0.25 * t)
 
                     if (i > 0) {
                         input = arr[i - 1].length
@@ -153,10 +146,18 @@
                     let te = canvas.width / input
 
                     let po = te / 2
-
+                                        
+                    
                     for (let index = 0; index < input; index++) {
                         let n = y[index]
                         n = NeuralNetwork.activation(n)
+                        let grad= ctx.createLinearGradient(...[p, pos], ...[po, pos - temp])
+                        grad.addColorStop(0, co)
+                        let collo = rgbToHex((col-c), 0, (255 - col + c))
+                        grad.addColorStop(1, collo)
+
+                        ctx.strokeStyle = grad
+
                         ctx.lineWidth = 0.05 * te * n
                         if (n != 0) {
                             drawLine([po, pos - temp], [p, pos])
@@ -168,9 +169,14 @@
                 })
                 pos += temp
             })
+        console.timeEnd("draw")
+        console.timeEnd("All")
         }
 
+        console.time("All")
+        console.time("Request")
         getData().then(() => {
+            console.timeEnd("Request")
             drawNetwork(arr, biases)
         })
 

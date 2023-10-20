@@ -25,7 +25,7 @@ async function main() {
     const size = 6
 
     console.time("Layer creation")
-    let network = new NeuralNetwork(size, 6, 8)
+    let network = new NeuralNetwork(size, 6, 6, 6, 8)
     console.timeEnd("Layer creation")
     fs.writeFile('nodes.txt', JSON.stringify(network.layers))
     fs.writeFile('biases.txt', JSON.stringify(network.biases))
