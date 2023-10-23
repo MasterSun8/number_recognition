@@ -80,6 +80,12 @@
             ctx.stroke()
         }
 
+        function highlightNode(row, column){
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            drawNetwork()
+            
+        }
+
         canvas.addEventListener("mousemove", (e) => {
             let temp = Math.round(canvas.height / (arr.length + 1))
             let a = e.clientY%temp
@@ -97,13 +103,12 @@
             let aa = e.clientX%tt
             let oo = (e.clientX - aa) / tt
 
-            console.log([o, oo])
-            
+            highlightNode(o, oo)
         })
 
-        function drawNetwork(ar, bi) {
-            arr = ar
-            biases = bi
+        function drawNetwork(ar = null, bi = null) {
+            arr = ar != null ? ar : arr
+            biases = bi != null ? bi : biases
             console.time("draw")
             let c = Math.floor(255 / (arr.length))
             let temp = canvas.height / (arr.length + 1)
@@ -117,7 +122,7 @@
             let p = t / 2
 
             for (let ind = 0; ind < input; ind++) {
-                drawDot(pos, p, 0.25 * t)
+                drawDot(pos, p, 0.001 * t * temp)
                 p += t
             }
             pos += temp
@@ -132,12 +137,12 @@
                     ctx.lineWidth = 0.125 * t
                     try {
                         if (biases[i][ind] > 0) {
-                            ctx.lineWidth = 0.125 * t / (3 / biases[i][ind]) + 0.2
+                            ctx.lineWidth = 0.001 * t * temp * biases[i][ind] / 3 + 0.2
                         } else {
-                            ctx.lineWidth = NeuralNetwork.activation(0.125 * t + biases[i][ind]) + 0.2
+                            ctx.lineWidth = NeuralNetwork.activation(0.0005 * t * temp + biases[i][ind]) + 0.2
                         }
                     } catch { }
-                    drawDot(pos, p, 0.25 * t)
+                    drawDot(pos, p, 0.001 * t * temp)
 
                     if (i > 0) {
                         input = arr[i - 1].length
@@ -146,8 +151,7 @@
                     let te = canvas.width / input
 
                     let po = te / 2
-                                        
-                    
+
                     for (let index = 0; index < input; index++) {
                         let n = y[index]
                         n = NeuralNetwork.activation(n)
@@ -170,7 +174,6 @@
                 pos += temp
             })
         console.timeEnd("draw")
-        console.timeEnd("All")
         }
 
         console.time("All")
@@ -178,6 +181,7 @@
         getData().then(() => {
             console.timeEnd("Request")
             drawNetwork(arr, biases)
+            console.timeEnd("All")
         })
 
 
