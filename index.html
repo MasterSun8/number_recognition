@@ -83,7 +83,8 @@
         function highlightNode(row, column){
             ctx.clearRect(0, 0, canvas.width, canvas.height)
             drawNetwork()
-            
+
+            drawHighlight(row, column)
         }
 
         canvas.addEventListener("mousemove", (e) => {
@@ -106,6 +107,50 @@
             highlightNode(o, oo)
         })
 
+        function drawHighlight(row, column){
+            console.time("Highlight")
+            // console.log(row, column)
+            let temp = canvas.height / (arr.length + 1)
+            let pos = temp / 2 + row*temp
+
+            let len = row==0 ? arr[0][0].length : arr[row-1].length
+            let t = canvas.width / len
+            let p = t / 2 + column*t
+            
+            ctx.strokeStyle = rgbToHex(128, 255, 128)
+            ctx.lineWidth = 0.0005 * t * temp * (row>0 ? Math.abs(biases[row-1][column]) : 1) + 0.6
+            drawDot(pos, p, 0.001 * t * temp)
+
+            if(row<arr.length){
+                let bot = arr[row].length
+                let te = canvas.width / bot
+                let po = te / 2
+                for(let i = 0; i<bot; i++){
+                    ctx.lineWidth = 0.1 * te * (NeuralNetwork.activation(arr[row][i][column]) + 0.1)
+                    drawLine([p, pos], [po, pos+temp])
+                    po += te
+                }
+            }
+
+            if(row==0){
+                console.timeEnd("Highlight")
+                return
+            }
+            if(row>1){
+                let a = row > 0 ? arr[row-2] : arr[0][0]
+            }
+            let top = a.length
+            let tem = canvas.width / top
+            let posi = tem / 2
+            for(let i = 0; i<top; i++){
+                ctx.lineWidth = 0.0002 * tem * temp * (NeuralNetwork.activation(a[i][column]) + 1)
+                drawLine([p, pos], [posi, pos-temp])
+                posi += tem
+            }
+
+            console.timeEnd("Highlight")
+        }
+
         function drawNetwork(ar = null, bi = null) {
             arr = ar != null ? ar : arr
             biases = bi != null ? bi : biases
@@ -118,6 +163,7 @@
             let col = 0
 
             let co = rgbToHex(col, 0, (255 - col))
+            ctx.lineWidth = 0.0002 * t * temp
             ctx.strokeStyle = co
             let p = t / 2
 
@@ -134,14 +180,7 @@
                 p = t / 2
                 x.forEach((y, ind) => {
                     ctx.strokeStyle = co
-                    ctx.lineWidth = 0.125 * t
-                    try {
-                        if (biases[i][ind] > 0) {
-                            ctx.lineWidth = 0.001 * t * temp * biases[i][ind] / 3 + 0.2
-                        } else {
-                            ctx.lineWidth = NeuralNetwork.activation(0.0005 * t * temp + biases[i][ind]) + 0.2
-                        }
-                    } catch { }
+                    ctx.lineWidth = 0.0005 * t * temp * Math.abs(biases[i][ind]) + 0.6
                     drawDot(pos, p, 0.001 * t * temp)
 
                     if (i > 0) {
@@ -154,7 +193,7 @@
 
                     for (let index = 0; index < input; index++) {
                         let n = y[index]
-                        n = NeuralNetwork.activation(n)
+                        n = NeuralNetwork.activation(n) + 0.05
                         let grad= ctx.createLinearGradient(...[p, pos], ...[po, pos - temp])
                         grad.addColorStop(0, co)
                         let collo = rgbToHex((col-c), 0, (255 - col + c))
