@@ -132,18 +132,18 @@
                 }
             }
 
-            if(row==0){
+            if(row<1){
                 console.timeEnd("Highlight")
                 return
             }
-            if(row>1){
-                let a = row > 0 ? arr[row-2] : arr[0][0]
-            }
+            let a = row > 1 ? arr[row-2] : arr[0][0]
             let top = a.length
             let tem = canvas.width / top
             let posi = tem / 2
             for(let i = 0; i<top; i++){
-                ctx.lineWidth = 0.0002 * tem * temp * (NeuralNetwork.activation(a[i][column]) + 1)
+                try{
+                ctx.lineWidth = 0.0002 * tem * temp * (row<1 ? NeuralNetwork.activation(a[i][column]) + 1 : 1)
+                }catch{}
                 drawLine([p, pos], [posi, pos-temp])
                 posi += tem
             }
