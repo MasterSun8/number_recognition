@@ -67,6 +67,14 @@
         canvas.width = document.body.scrollWidth
         canvas.height = document.body.scrollHeight
 
+        window.addEventListener('resize', resizeCanvas, false);
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth
+            canvas.height = window.innerHeight
+            drawNetwork()
+        }
+
         function drawLine(begin, end) {
             ctx.beginPath()
             ctx.moveTo(...begin)
