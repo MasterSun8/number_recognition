@@ -149,9 +149,7 @@
             let tem = canvas.width / top
             let posi = tem / 2
             for(let i = 0; i<top; i++){
-                try{
-                ctx.lineWidth = 0.0002 * tem * temp * (row<1 ? NeuralNetwork.activation(a[i][column]) + 1 : 1)
-                }catch{}
+                ctx.lineWidth = 0.1 * tem * (row > 1 ? NeuralNetwork.activation(a[i][column]) + 0.1 : 0.1)
                 drawLine([p, pos], [posi, pos-temp])
                 posi += tem
             }
